@@ -1,0 +1,30 @@
+1: Create a new React Native app
+   npx react-native init <App name>
+   cd MyApp
+
+2: Start Metro bundler (debug mode) : Leave this running in a terminal.
+   npx react-native start
+
+3: Run on Android : testing purpose
+   npx react-native run-android
+
+4: Build APK for offline release demo (production-ready)
+   
+   Step 4a: Bundle JS into APK
+          npx react-native bundle \
+        --platform android \
+        --dev false \
+        --entry-file index.js \
+        --bundle-output android/app/src/main/assets/index.android bundle \
+        --assets-dest android/app/src/main/res
+
+    Step 4b: Build release APK
+        cd android
+        ./gradlew assembleRelease
+        cd ..
+
+    Step 4c: Install release APK on device
+        adb install -r android/app/build/outputs/apk/release/app-release.apk
+
+
+app is fully offline, will not crash on anytime
