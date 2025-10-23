@@ -9,6 +9,9 @@ export const calculateResults = (
   answers: Answers
 ) => {
   let correct = 0;
+  let wrong = 0;
+  let unanswered = 0;
+  let totalMarks = 0;
   const categoryScores: CategoryScores = {};
 
   currentExam.questions.forEach(q => {
@@ -17,9 +20,34 @@ export const calculateResults = (
     }
     categoryScores[q.category].total++;
 
-    if (answers[q.id] === q.correct) {
+    // Check if answered
+    if (answers[q.id] === undefined) {
+      unanswered++;
+      return;
+    }
+
+    // Check if correct
+    let isCorrect = false;
+    
+    if (q.type === 'multiple') {
+      // Multiple choice - compare arrays
+      const userAnswer = (Array.isArray(answers[q.id]) ? answers[q.id] : [answers[q.id]]) as number[];
+const correctAnswer = (Array.isArray(q.correct) ? q.correct : [q.correct]) as number[];
+      
+      isCorrect = userAnswer.length === correctAnswer.length &&
+                  userAnswer.every(ans => correctAnswer.includes(ans));
+    } else {
+      // Single choice or boolean
+      isCorrect = answers[q.id] === q.correct;
+    }
+
+    if (isCorrect) {
       correct++;
       categoryScores[q.category].correct++;
+      totalMarks += q.marks || currentExam.positiveMarks;
+    } else {
+      wrong++;
+      totalMarks -= currentExam.negativeMarking;
     }
   });
 
@@ -36,7 +64,11 @@ export const calculateResults = (
 
   return { 
     score, 
-    correct, 
+    correct,
+    wrong,
+    unanswered,
+    totalMarks,
+    maxMarks: currentExam.questions.length * (currentExam.positiveMarks || 1),
     total: currentExam.questions.length, 
     categoryScores, 
     strengths, 

@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 export const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f3f4f6',
   },
   header: {
     backgroundColor: '#7c3aed',
     padding: 20,
-    paddingTop: 10,
+    paddingTop: 60,
   },
   headerTitle: {
     fontSize: 24,
@@ -20,11 +20,27 @@ export const commonStyles = StyleSheet.create({
     color: '#e9d5ff',
     marginTop: 4,
   },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+    marginTop: 12,
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#1f2937',
+  },
   button: {
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginVertical: 8,
+    justifyContent: 'center',
   },
   primaryButton: {
     backgroundColor: '#7c3aed',
@@ -37,34 +53,18 @@ export const commonStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  input: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-    marginTop: 12,
-  },
   footer: {
     flexDirection: 'row',
-    padding: 16,
+    padding: 20,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#e5e7eb',
+    gap: 12,
   },
   footerButtonLeft: {
     flex: 1,
-    marginRight: 8,
   },
   footerButtonRight: {
     flex: 1,
-    marginLeft: 8,
   },
 });
