@@ -38,63 +38,61 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   const [recentAttempts, setRecentAttempts] = useState<ExamAttempt[]>([]);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-  const loadStudentStats = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    const loadStudentStats = async () => {
+      try {
+        setLoading(true);
 
-      // Fetch all exam attempts for this student
-      const { data: attempts, error } = await supabase
-        .from('exam_attempts')
-        .select(`
-          id,
-          exam_id,
-          score,
-          total_marks,
-          completed_at,
-          exams (
-            title
-          )
-        `)
-        .eq('student_id', user.id)
-        .order('completed_at', { ascending: false });
+        // Fetch all exam attempts for this student
+        const { data: attempts, error } = await supabase
+          .from('exam_attempts')
+          .select('id, exam_id, score, total_marks, completed_at')
+          .eq('student_id', user.id)
+          .order('completed_at', { ascending: false });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      if (attempts && attempts.length > 0) {
-        const totalExams = attempts.length;
-        const totalScore = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
-        const average = totalScore / totalExams;
+        if (attempts && attempts.length > 0) {
+          const totalExams = attempts.length;
+          const totalScore = attempts.reduce((sum, attempt) => sum + attempt.score, 0);
+          const average = totalScore / totalExams;
 
-        setExamsTaken(totalExams);
-        setAvgScore(average);
+          setExamsTaken(totalExams);
+          setAvgScore(average);
 
-        // Format recent attempts (top 3)
-        const formatted = attempts.slice(0, 3).map((attempt: any) => ({
-          id: attempt.id,
-          exam_id: attempt.exam_id,
-          score: attempt.score,
-          total_marks: attempt.total_marks,
-          completed_at: attempt.completed_at,
-          exam_title: attempt.exams?.title || 'Untitled Exam',
-        }));
+          // Get exam titles separately
+          const examIds = [...new Set(attempts.map(a => a.exam_id))];
+          const { data: exams } = await supabase
+            .from('exams')
+            .select('id, title')
+            .in('id', examIds);
 
-        setRecentAttempts(formatted);
-      } else {
-        setExamsTaken(0);
-        setAvgScore(0);
-        setRecentAttempts([]);
+          // Format recent attempts (top 3) with exam titles
+          const formatted = attempts.slice(0, 3).map((attempt) => ({
+            id: attempt.id,
+            exam_id: attempt.exam_id,
+            score: attempt.score,
+            total_marks: attempt.total_marks,
+            completed_at: attempt.completed_at,
+            exam_title: exams?.find(e => e.id === attempt.exam_id)?.title || 'Untitled Exam',
+          }));
+
+          setRecentAttempts(formatted);
+        } else {
+          setExamsTaken(0);
+          setAvgScore(0);
+          setRecentAttempts([]);
+        }
+      } catch (error) {
+        console.error('Error loading student stats:', error);
+        Alert.alert('Error', 'Failed to load statistics');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error('Error loading student stats:', error);
-      Alert.alert('Error', 'Failed to load statistics');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  loadStudentStats();
-}, [user.id]);
+    loadStudentStats();
+  }, [user.id]);
 
   const getGrade = (score: number): string => {
     if (score >= 90) return 'A+';

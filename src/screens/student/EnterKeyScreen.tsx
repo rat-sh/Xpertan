@@ -39,12 +39,11 @@ const EnterKeyScreen: React.FC<EnterKeyScreenProps> = ({
     try {
       console.log('[EXAM LOAD] Fetching exam with key:', cleanKey);
       
-      // ✅ CRITICAL: Fetch with id field included
       const { data: examData, error } = await supabase
-        .from('exams')
-        .select('id, title, key, questions, duration, negative_marking, positive_marks, teacher_id, batch_id, created_at')
-        .eq('key', cleanKey)
-        .single();
+      .from('exams')
+      .select('*')
+      .eq('key', cleanKey)
+      .single();
 
       if (error) {
         console.error('[EXAM LOAD] Supabase error:', error);

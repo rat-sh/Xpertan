@@ -181,14 +181,11 @@ const saveExam = async (): Promise<void> => {
   try {
     const key = editExamKey || generateKey();
     
-    // ✅ CRITICAL: Generate UUID for exam ID
-    const examId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    console.log('[EXAM CREATE] Creating exam with key:', key);
     
-    console.log('[EXAM CREATE] Creating exam with:', { id: examId, key });
-    
-    // Prepare exam data with ID
+    // Prepare exam data
     const exam: Exam = {
-      id: examId,         
+      id: '',
       title: examTitle,
       key: key,
       questions: questions,
@@ -201,9 +198,9 @@ const saveExam = async (): Promise<void> => {
     };
     
     const examData = transformExamToDB(exam);
+    delete examData.id;
     
     console.log('[EXAM CREATE] Exam data prepared:', {
-      id: examData.id,
       key: examData.key,
       questionCount: examData.questions?.length,
     });
@@ -228,16 +225,18 @@ const saveExam = async (): Promise<void> => {
       ]);
     } else {
       // Insert new exam
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('exams')
-        .insert(examData);
+        .insert(examData)
+        .select('id, key')
+        .single();
 
       if (error) {
         console.error('[EXAM CREATE] Insert error:', error);
         throw error;
       }
 
-      console.log('[EXAM CREATE] Exam created successfully');
+      console.log('[EXAM CREATE] Exam created successfully with ID:', data?.id);
       Alert.alert(
         'Exam Created!',
         `Your exam key is: ${key}\nDuration: ${duration} seconds\n\nShare this key with students to take the exam.`,
