@@ -10,6 +10,8 @@ import {
   StatusBar,
   Easing,
   Dimensions,
+  Linking,
+  Alert,
 } from 'react-native';
 
 export type UserRole = 'teacher' | 'student';
@@ -36,6 +38,20 @@ const SplashScreen: React.FC<SplashScreenProps> = ({
   const [slideAnim] = useState(new Animated.Value(30));
   const [scaleTeacher] = useState(new Animated.Value(1));
   const [scaleStudent] = useState(new Animated.Value(1));
+
+  // Safe URL opener with error handling
+  const openURL = async (url: string, platform: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        Alert.alert('Error', `Cannot open ${platform}. Please check if the app is installed.`);
+      }
+    } catch (error) {
+      Alert.alert('Error', `Failed to open ${platform}. Please try again later.`);
+    }
+  };
 
   useEffect(() => {
     if (!isCheckingAuth) {
@@ -104,13 +120,11 @@ const SplashScreen: React.FC<SplashScreenProps> = ({
           },
         ]}
       >
-        
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>XPERTAN</Text>
           <Text style={styles.tagline}>Excellence in Assessment</Text>
         </View>
-
 
         {/* Main Card Container */}
         <View style={styles.mainCard}>
@@ -164,10 +178,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({
           <View style={styles.footerLinks}>
             <TouchableOpacity 
               activeOpacity={0.7}
-              onPress={() => {
-                // Open LinkedIn - Add: Linking.openURL('https://linkedin.com/in/yourprofile');
-                console.log('Opening LinkedIn...');
-              }}
+              onPress={() => openURL('https://www.linkedin.com/in/rathi-ghosh-894a4a2b1', 'LinkedIn')}
             >
               <Text style={styles.footerLink}>Rathi</Text>
             </TouchableOpacity>
@@ -176,10 +187,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({
             
             <TouchableOpacity 
               activeOpacity={0.7}
-              onPress={() => {
-                // Open GitHub - Add: Linking.openURL('https://github.com/yourusername');
-                console.log('Opening GitHub...');
-              }}
+              onPress={() => openURL('https://github.com/rat-sh', 'GitHub')}
             >
               <Text style={styles.footerLink}>Git</Text>
             </TouchableOpacity>

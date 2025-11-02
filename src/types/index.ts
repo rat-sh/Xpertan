@@ -94,6 +94,6 @@ export interface ExamResults {
   categoryScores: CategoryScores;
 }
 
-export type Mode = 'splash' | 'login' | 'signup' | 'create' | 'answer' | 'answerSetup' | 'dashboard'  | 'questionBank' | 'batchManagement';
+export type Mode = 'splash' | 'login' | 'signup' | 'forgotPin' | 'create' | 'answer' | 'answerSetup' | 'dashboard'  | 'questionBank' | 'batchManagement';
 
 export type UserRole = 'teacher' | 'student';

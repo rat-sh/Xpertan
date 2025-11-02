@@ -25,6 +25,7 @@ import { transformUserFromDB, transformExamAttemptToDB } from './src/utils/trans
 import { supabaseQuery, getNetworkErrorMessage, checkConnectivity } from './src/utils/networkUtils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from 'react-native';
+import ForgotPinScreen from './src/screens/auth/ForgotPinScreen';
 
 const App: React.FC = () => {
   const [mode, setMode] = useState<Mode>('splash');
@@ -278,6 +279,18 @@ const App: React.FC = () => {
       <SignUpScreen
         onSignUp={handleSignUp}
         onNavigate={handleNavigate}
+      />
+    );
+  }
+
+  // Forgot PIN screen
+  if (mode === 'forgotPin') {
+    return (
+      <ForgotPinScreen
+        onNavigate={handleNavigate}
+        onBack={() => {
+          setMode('login');
+        }}
       />
     );
   }
