@@ -37,7 +37,7 @@ const App: React.FC = () => {
   const [questionTimes, setQuestionTimes] = useState<{ [key: number]: number }>({});
   const [showResults, setShowResults] = useState<boolean>(false);
   const [isOffline, setIsOffline] = useState<boolean>(false);
-
+/*
   const checkUserSession = React.useCallback(async () => {
     try {
       // Check connectivity before attempting network operations
@@ -110,6 +110,25 @@ const App: React.FC = () => {
   useEffect(() => {
     checkUserSession();
   }, [checkUserSession]);
+*/
+// This is for development purpose
+useEffect(() => {
+  setIsCheckingAuth(false);
+  setMode('dashboard');
+  
+  const testUser: User = {
+    id: 'test-teacher-id',
+    name: 'Test Teacher',
+    email: 'teacher@test.com',
+    phone: '1234567890',
+    role: 'teacher',
+  };
+  
+  setUser(testUser);
+  setSelectedRole('teacher');
+}, []);
+
+// upper is short cut for bypass
 
   const handleRoleSelect = (role: UserRole) => {
     setSelectedRole(role);
