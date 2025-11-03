@@ -13,8 +13,11 @@ import {
   Platform,
 } from 'react-native';
 
+import { commonStyles } from '../../styles/commonStyles';
 import { Question, Mode, QuestionType, User, Exam } from '../../types';
 import { generateKey } from '../../utils/helpers';
+import QuestionTypeSelector from '../../components/QuestionTypeSelector';
+import ImportQuestionsScreen from './ImportQuestionsScreen';
 import { supabase } from '../../config/supabase';
 import { transformExamToDB } from '../../utils/transformers';
 
@@ -37,11 +40,12 @@ const CreateExamScreen: React.FC<CreateExamScreenProps> = ({
   onNavigate,
   editExamKey,
 }) => {
-  // Batch & Settings - All hooks must be at the top level
+  // Batch & Settings
   const [selectedBatch, setSelectedBatch] = useState<string>('');
   const [showBatchCard, setShowBatchCard] = useState<boolean>(false);
   const [showSettingsCard, setShowSettingsCard] = useState<boolean>(false);
-  
+  const batches = ['Batch A', 'Batch B', 'Batch C', 'Batch D'];
+
   // Exam Settings
   const [examTitle, setExamTitle] = useState<string>('');
   const [hours, setHours] = useState<string>('0');
@@ -62,61 +66,54 @@ const CreateExamScreen: React.FC<CreateExamScreenProps> = ({
   const [questionNegativeMarks, setQuestionNegativeMarks] = useState<string>('0');
 
   // Text Formatting States
-  const [isBold, setIsBold] = useState<boolean>(false);
-  const [isItalic, setIsItalic] = useState<boolean>(false);
-  const [isUnderline, setIsUnderline] = useState<boolean>(false);
+  const [isBold, setIsBold] = useState(false);
+  const [isItalic, setIsItalic] = useState(false);
+  const [isUnderline, setIsUnderline] = useState(false);
   const [listType, setListType] = useState<'none' | 'ul' | 'ol'>('none');
 
   // UI States
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [editingQuestionIndex, setEditingQuestionIndex] = useState<number | null>(null);
-  const [isPreviewModalVisible, setIsPreviewModalVisible] = useState<boolean>(false);
+  const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
   const [examKey, setExamKey] = useState<string>('');
 
-  // Constants
-  const batches = ['Batch A', 'Batch B', 'Batch C', 'Batch D'];
-
   // Handlers
-  const getTotalSeconds = React.useCallback((): number => {
+  const getTotalSeconds = (): number => {
     const h = parseInt(hours, 10) || 0;
     const m = parseInt(minutes, 10) || 0;
     const s = parseInt(seconds, 10) || 0;
     return h * 3600 + m * 60 + s;
-  }, [hours, minutes, seconds]);
+  };
 
-  const handleOptionChange = React.useCallback((index: number, value: string) => {
-    setOptions(prevOptions => {
-      const newOptions = [...prevOptions];
-      newOptions[index] = value;
-      return newOptions;
-    });
-  }, []);
+  const handleOptionChange = (index: number, value: string) => {
+    const newOptions = [...options];
+    newOptions[index] = value;
+    setOptions(newOptions);
+  };
 
-  const addOption = React.useCallback(() => {
-    setOptions(prevOptions => [...prevOptions, '']);
-  }, []);
+  const addOption = () => {
+    setOptions([...options, '']);
+  };
 
-  const removeOption = React.useCallback((index: number) => {
+  const removeOption = (index: number) => {
     if (options.length <= 2) {
       Alert.alert('Error', 'Minimum 2 options required');
       return;
     }
-    setOptions(prevOptions => prevOptions.filter((_, i) => i !== index));
-  }, [options.length]);
+    setOptions(options.filter((_, i) => i !== index));
+  };
 
-  const toggleCorrectOption = React.useCallback((index: number) => {
+  const toggleCorrectOption = (index: number) => {
     if (questionType === 'multiple') {
-      setCorrectOptions(prev => {
-        if (prev.includes(index)) {
-          return prev.filter((i) => i !== index);
-        } else {
-          return [...prev, index];
-        }
-      });
+      if (correctOptions.includes(index)) {
+        setCorrectOptions(correctOptions.filter((i) => i !== index));
+      } else {
+        setCorrectOptions([...correctOptions, index]);
+      }
     }
-  }, [questionType]);
+  };
 
-  const getCorrectAnswerValue = React.useCallback((): number | number[] | null => {
+  const getCorrectAnswerValue = (): number | number[] | null => {
     if (examFormat === 'theoretical') return 0;
     
     if (questionType === 'boolean') {
@@ -140,9 +137,9 @@ const CreateExamScreen: React.FC<CreateExamScreenProps> = ({
       return null;
     }
     return parseInt(correctOption, 10);
-  }, [examFormat, questionType, correctOption, correctOptions]);
+  };
 
-  const clearQuestionForm = React.useCallback(() => {
+  const clearQuestionForm = () => {
     setCurrentQ('');
     setOptions(['', '', '', '']);
     setCorrectOption('');
@@ -154,7 +151,7 @@ const CreateExamScreen: React.FC<CreateExamScreenProps> = ({
     setIsItalic(false);
     setIsUnderline(false);
     setListType('none');
-  }, []);
+  };
 
   const addQuestion = () => {
     if (!currentQ || !category) {
